@@ -6,4 +6,5 @@ import com.sample2.app.shared.UserDto;
 
 public interface UserService extends UserDetailsService{
 	UserDto createUser(UserDto user);
+	UserDto getUser(String email);
 }

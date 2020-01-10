@@ -5,9 +5,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.sample2.app.service.UserService;
+
+import ch.qos.logback.core.filter.Filter;
 
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter{
@@ -25,10 +28,15 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 	public void configure(HttpSecurity http) throws Exception
 	{
 		http.csrf().disable().authorizeRequests()
-		.antMatchers(HttpMethod.POST, "/users")
+		.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
 		.permitAll()
 		.anyRequest()
-		.authenticated();
+		.authenticated()
+		.and()
+		.addFilter(getAuthenticationFilter())
+		.addFilter(new AuthorizationFilter(authenticationManager()))
+		.sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 	
 	@Override
@@ -36,6 +44,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
 	{
 		auth.userDetailsService(userDetailsService)
 		.passwordEncoder(bCryptPasswordEncoder);
+	}
+	
+	public AuthenticationFilter getAuthenticationFilter() throws Exception
+	{
+		final AuthenticationFilter filter = new AuthenticationFilter(authenticationManager());
+		filter.setFilterProcessesUrl("/users/login");
+		return filter;
 	}
 	
 }
