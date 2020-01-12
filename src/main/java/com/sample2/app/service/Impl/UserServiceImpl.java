@@ -10,11 +10,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.sample2.app.exceptions.UserServiceException;
 import com.sample2.app.io.entity.UserEntity;
 import com.sample2.app.repository.UserRepository;
 import com.sample2.app.service.UserService;
 import com.sample2.app.shared.UserDto;
 import com.sample2.app.shared.Utils;
+import com.sample2.app.ui.model.response.ErrorMessage;
+import com.sample2.app.ui.model.response.ErrorMessages;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -76,12 +79,29 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public UserDto getUserByUserId(String userId) {
 		
+		UserDto returnValue = new UserDto();
 		UserEntity userEntity = userRepository.findByUserId(userId);
 		
 		if( userEntity == null ) throw new UsernameNotFoundException(userId);
 		
-		UserDto returnValue = new UserDto();
 		BeanUtils.copyProperties(userEntity, returnValue);
+		
+		return returnValue;
+	}
+
+	@Override
+	public UserDto updateUser(String userId, UserDto userDto) {
+		
+		UserDto returnValue = new UserDto();
+		UserEntity userEntity = userRepository.findByUserId(userId);
+		
+		if( userEntity == null ) throw new UserServiceException(ErrorMessages.NORECORD_FOUND.getErrorMessage());
+		
+		userEntity.setFirstName(userDto.getFirstName());
+		userEntity.setLastName(userDto.getLastName());
+		
+		UserEntity updatedUserDetails = userRepository.save(userEntity);
+		BeanUtils.copyProperties(updatedUserDetails, returnValue);
 		
 		return returnValue;
 	}
