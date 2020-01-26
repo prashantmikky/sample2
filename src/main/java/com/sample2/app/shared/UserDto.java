@@ -1,6 +1,7 @@
 package com.sample2.app.shared;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UserDto implements Serializable{
 
@@ -14,6 +15,7 @@ public class UserDto implements Serializable{
 	private String encryptedPassword;
 	private String emailVarificationToken;
 	private String emailVarificationStatus;
+	private List<AddressDto> addresses;
 	
 	public long getId() {
 		return id;
@@ -68,6 +70,12 @@ public class UserDto implements Serializable{
 	}
 	public void setEmailVarificationStatus(String emailVarificationStatus) {
 		this.emailVarificationStatus = emailVarificationStatus;
+	}
+	public List<AddressDto> getAddresses() {
+		return addresses;
+	}
+	public void setAddresses(List<AddressDto> addresses) {
+		this.addresses = addresses;
 	}
 	
 	
